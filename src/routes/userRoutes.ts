@@ -2,9 +2,8 @@ import {Router} from 'express';
 import * as userController from '../controllers/userController';
 
 const router = Router();
-
-router.get('/', userController.getAllMyModels);
-router.get('/:id', userController.getMyModel);
-router.post('/', userController.createMyModel);
+router.post('/register', userController.register);
+router.post('/login', userController.login);
+router.post('/refresh', userController.refreshToken);
 
 export default router;
