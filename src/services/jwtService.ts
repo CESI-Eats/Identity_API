@@ -1,8 +1,9 @@
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { AppDataSource } from "../data-source"
 import { RefreshToken } from '../entity/RefreshToken';
+import { IdentityType } from '../entity/Identity';
 
-export const createToken = (id: string): string => {
+export const createToken = (id: string, type: IdentityType): string => {
   const header = {
     alg: 'HS256',
     typ: 'JWT',
@@ -11,6 +12,7 @@ export const createToken = (id: string): string => {
 
   const payload = {
     sub: id,
+    type: type,
     exp: Math.floor(Date.now() / 1000) + (5 * 60), 
   };
 
@@ -26,13 +28,13 @@ export const createRefreshToken = async (id: string): Promise<string> => {
 
   const payload = {
     sub: id,
-    exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60), 
+    exp: Math.floor(Date.now() / 1000) + (30 * 24 * 60 * 60),
   };
   
   const token = jwt.sign(payload, process.env.REFRESH_SECRET_KEY, { header })
   
   const refreshTokenEntity = new RefreshToken();
-  refreshTokenEntity.userId = Number(id);
+  refreshTokenEntity.userId = id;
   refreshTokenEntity.token = token;
   await AppDataSource.manager.save(refreshTokenEntity);
 

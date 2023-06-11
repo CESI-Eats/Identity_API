@@ -1,27 +1,28 @@
 import { Request, Response } from 'express';
-import { User } from "../entity/User"
+import { Identity, IdentityType } from "../entity/Identity"
 import { AppDataSource } from "../data-source"
 import { createToken, createRefreshToken, validateRefreshToken, invalidateRefreshToken } from "../services/jwtService";
 
 // Register
 export const register = async (req: Request, res: Response) => {
   try {
-    const { mail, password } = req.body;
+    const { mail, password, type } = req.body;
 
     // Check if the user already exists
-    let user = await AppDataSource.manager.findOneBy(User, { mail: mail });
+    let identity = await AppDataSource.manager.findOneBy(Identity, { mail: mail });
 
-    if (user) {
+    if (identity) {
       return res.status(400).json({ message: 'User already exists' });
     }
 
     // Create the new user
-    user = new User();
-    user.mail = mail;
-    user.password = password;
+    identity = new Identity();
+    identity.mail = mail;
+    identity.password = password;
+    setIdentityType(identity, type)
 
     // Save the new user
-    const newUser = await AppDataSource.manager.save(user);
+    const newUser = await AppDataSource.manager.save(identity);
 
     res.status(201).json(newUser);
   } catch (err) {
@@ -36,19 +37,19 @@ export const login = async (req: Request, res: Response) => {
     const { mail, password } = req.body;
 
     // Check if the user exists
-    let user = await AppDataSource.manager.findOneBy(User, { mail: mail });
+    let identity = await AppDataSource.manager.findOneBy(Identity, { mail: mail });
 
-    if (!user) {
+    if (!identity) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    if (password != user.password) {
+    if (password != identity.password) {
       return res.status(400).json({ message: 'Incorrect password' });
     }
 
     // Create a JWT token
-    const token = createToken(String(user.id));
-    const refreshToken = await createRefreshToken(String(user.id));
+    const token = createToken(identity.id, identity.type);
+    const refreshToken = await createRefreshToken(identity.id);
 
     res.status(200).json({ token, refreshToken });
   } catch (err) {
@@ -63,15 +64,16 @@ export const refreshToken = async (req: Request, res: Response) => {
     const { refreshToken } = req.body;
 
     // Validate the refresh token
-    const userId = await validateRefreshToken(refreshToken);
+    const identityId = await validateRefreshToken(refreshToken);
+    const identity = await AppDataSource.manager.findOneBy(Identity, { id: identityId });
 
-    if (!userId) {
+    if (!identityId || !identity) {
       return res.status(403).json({ message: 'Invalid refresh token' });
     }
 
     // If valid, create a new JWT token
-    const token = createToken(userId);
-    const newRefreshToken = await createRefreshToken(userId);
+    const token = createToken(identity.id, identity.type);
+    const newRefreshToken = await createRefreshToken(identity.id);
 
     await invalidateRefreshToken(refreshToken);
 
@@ -81,3 +83,11 @@ export const refreshToken = async (req: Request, res: Response) => {
     res.status(500).json({ message: errMessage });
   }
 };
+
+function setIdentityType(identity: Identity, type: string): void {
+  if (Object.values(IdentityType).includes(type as IdentityType)) {
+    identity.type = type as IdentityType;
+  } else {
+    throw new Error(`Invalid identity type: ${type}`);
+  }
+}
