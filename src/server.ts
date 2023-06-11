@@ -1,7 +1,9 @@
+import dotenv from 'dotenv';
 import { AppDataSource } from "./data-source"
 import express from 'express';
 import userRoutes from "./routes/userRoutes";
 
+dotenv.config();
 const app = express();
 
 AppDataSource.initialize().then(async () => {
