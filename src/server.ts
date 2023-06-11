@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import { AppDataSource } from "./data-source"
 import express from 'express';
-import userRoutes from "./routes/userRoutes";
+import identityRoutes from "./routes/identityRoutes";
 
 dotenv.config();
 const app = express();
@@ -20,7 +20,7 @@ const swaggerFile = require('../swagger_output.json');
 
 // Endpoints
 app.get('/', (req, res) => {res.status(200).json({ response: true });});
-app.use('/users', userRoutes);
+app.use('/users', identityRoutes);
 app.use('/doc', swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
 // Start server

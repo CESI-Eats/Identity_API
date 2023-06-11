@@ -1,6 +1,6 @@
 import "reflect-metadata"
 import { DataSource } from "typeorm"
-import { User } from "./entity/User"
+import { Identity } from "./entity/Identity"
 import { RefreshToken } from "./entity/RefreshToken"
 
 export const AppDataSource = new DataSource({
@@ -12,7 +12,7 @@ export const AppDataSource = new DataSource({
     database: "identity_dev",
     synchronize: true,
     logging: false,
-    entities: [User, RefreshToken],
+    entities: [Identity, RefreshToken],
     migrations: [],
     subscribers: [],
 })
