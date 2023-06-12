@@ -1,9 +1,9 @@
 import dotenv from 'dotenv';
+dotenv.config();
 import { AppDataSource } from "./data-source"
 import express from 'express';
 import identityRoutes from "./routes/identityRoutes";
 
-dotenv.config();
 const app = express();
 
 AppDataSource.initialize().then(async () => {
