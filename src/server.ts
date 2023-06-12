@@ -20,7 +20,7 @@ const swaggerFile = require('../swagger_output.json');
 
 // Endpoints
 app.get('/', (req, res) => {res.status(200).json({ response: true });});
-app.use('/users', identityRoutes);
+app.use('/', identityRoutes);
 app.use('/doc', swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
 // Start server
