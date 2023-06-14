@@ -7,6 +7,9 @@ import { createToken, createRefreshToken, validateRefreshToken, invalidateRefres
 export const register = async (req: Request, res: Response) => {
   try {
     const { mail, password, type } = req.body;
+    if (!mail || !password || !type) {
+      return res.status(400).json({ message: 'Missing mail, password or type' });
+    }
 
     // Check if the user already exists
     let identity = await AppDataSource.manager.findOneBy(Identity, { mail: mail });
@@ -35,6 +38,9 @@ export const register = async (req: Request, res: Response) => {
 export const login = async (req: Request, res: Response) => {
   try {
     const { mail, password } = req.body;
+    if (!mail || !password) {
+      return res.status(400).json({ message: 'Missing mail or password' });
+    }
 
     // Check if the user exists
     let identity = await AppDataSource.manager.findOneBy(Identity, { mail: mail });
@@ -62,6 +68,9 @@ export const login = async (req: Request, res: Response) => {
 export const refreshToken = async (req: Request, res: Response) => {
   try {
     const { refreshToken } = req.body;
+    if (!refreshToken) {
+      return res.status(400).json({ message: 'Missing refresh token' });
+    }
 
     // Validate the refresh token
     const identityId = await validateRefreshToken(refreshToken);
