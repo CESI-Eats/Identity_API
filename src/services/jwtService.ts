@@ -13,7 +13,7 @@ export const createToken = (id: string, type: IdentityType): string => {
   const payload = {
     sub: id,
     type: type,
-    exp: Math.floor(Date.now() / 1000) + (5 * 60), 
+    exp: Math.floor(Date.now() / 1000) + (Number(process.env.TOKEN_EXPIRATION_MINUTES) * 60), 
   };
 
   return jwt.sign(payload, process.env.SECRET_KEY, { header });
@@ -28,7 +28,7 @@ export const createRefreshToken = async (id: string): Promise<string> => {
 
   const payload = {
     sub: id,
-    exp: Math.floor(Date.now() / 1000) + (30 * 24 * 60 * 60),
+    exp: Math.floor(Date.now() / 1000) + (Number(process.env.REFRESH_TOKEN_EXPIRATION_DAYS) * 24 * 60 * 60),
   };
   
   const token = jwt.sign(payload, process.env.REFRESH_SECRET_KEY, { header })
