@@ -11,6 +11,7 @@ AppDataSource.initialize().then(async () => {
 }).catch((error) => console.log('Failed to connect to Postgres.', error));
 
 
+
 // Set JSON format for HTTP requests
 app.use(express.json());
 
