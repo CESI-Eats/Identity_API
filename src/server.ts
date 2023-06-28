@@ -8,7 +8,7 @@ const app = express();
 
 AppDataSource.initialize().then(async () => {
     console.log("Database successfully connected...")
-}).catch(error => console.log(error))
+})
 
 
 // Set JSON format for HTTP requests
